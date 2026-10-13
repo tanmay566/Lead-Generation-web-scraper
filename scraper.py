@@ -11,11 +11,12 @@ from playwright.async_api import async_playwright
 # ==========================================
 # Update these credentials to match your local PostgreSQL setup
 DB_CONFIG = {
-    "user": "postgres",
-    "password": "your_password",
+    "user": "scraper_user",
+    "password": "flat103bl550",  # Make sure this matches your DB password
     "database": "leads_db",
     "host": "localhost",
     "port": "5432"
+
 }
 
 # Configure logging for visibility
@@ -201,11 +202,23 @@ async def main(seed_urls: list):
 # ==========================================
 # EXECUTION
 # ==========================================
+# ==========================================
+# EXECUTION
+# ==========================================
 if __name__ == "__main__":
-    SEED_URLS = [
-        "https://example-supplement.com",
-        "https://example-tech.com"
-    ]
-    
-    # Run the async event loop
-    asyncio.run(main(SEED_URLS))
+    # Read URLs from a text file called 'targets.txt'
+    try:
+        with open("targets.txt", "r") as file:
+            # Read lines, remove empty spaces, and ignore blank lines
+            SEED_URLS = [line.strip() for line in file if line.strip()]
+            
+        logging.info(f"Loaded {len(SEED_URLS)} websites to scrape.")
+        
+        # Run the async event loop
+        if SEED_URLS:
+            asyncio.run(main(SEED_URLS)) 
+        else:
+            logging.error("targets.txt is empty. Add some URLs first!")
+            
+    except FileNotFoundError:
+        logging.error("Could not find targets.txt. Please create it in the same folder as this script.")
